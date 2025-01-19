@@ -12,3 +12,6 @@ def __init__(self, liver_name, live_title, URL, liver_tags = []):
     self.live_title = live_title
     self.URL = URL
     self.liver_tags = liver_tags
+
+def append_liver_tags(live_data :LiveData, liver_tags: list):
+    live_data.liver_tags.append(liver_tags)
