@@ -43,13 +43,16 @@ def is_err_https(status:int):
     
     return ret
 
-def main():
+def get_onlives():
 
     json_file = open("./json/streamers.json", 'r', encoding="utf-8_sig")
     livers = json.load(json_file)
     on_lives = []
 
     for liver in livers["data"]:
+        if not liver["youtube"]["channel_id"]:
+            continue
+
         # check channel rss
         rss = get_rss(liver["youtube"]["channel_id"])
 
@@ -57,11 +60,12 @@ def main():
             # check on lives
             videos_list = get_videos_list(rss)
 
-            # add liver tags
+            # mod list data
             for live in videos_list:
-                data_class.append_liver_tags(live, liver["tags"])
+                data_class.mod_liver_name(live, liver["name"])
+                data_class.mod_liver_tags(live, liver["tags"])
             
-            on_lives.append(videos_list)
+            on_lives += videos_list
     
     return on_lives
 

@@ -18,6 +18,9 @@ async def get_on_lives():
 
     # check on lives
     for liver in livers["data"]:
+        if not liver["twitch"]["display_name"]:
+            continue
+        
         stream = await first(twitch.get_streams(user_login=liver["twitch"]["display_name"]))
         if stream is not None:
             data = LiveData(liver["name"], stream.title, liver["twitch"]["URL"], liver["tags"])
