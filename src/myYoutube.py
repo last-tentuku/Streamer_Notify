@@ -2,7 +2,7 @@ import feedparser
 from googleapiclient.discovery import build
 import os
 import json
-import data_class
+import src.data_class as data_class
 
 DEVELOPER_KEY = os.environ["youtube_api_key"]
 youtube = build("youtube","v3",developerKey=DEVELOPER_KEY)

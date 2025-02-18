@@ -12,7 +12,7 @@ sys.path.append(
 
 from src import myYoutube
 from src import myTwitch
-from data_class import LiveData
+from src.data_class import LiveData
 
 BOT_TOKEN = os.environ["discord_token"]
 
@@ -63,37 +63,38 @@ async def get_onlives_loop():
 
     # get guild(server infomation)
     guild = client.guilds[0]
-    channels = guild.text_channels
 
     print(f"-----\nremove text channels")
     livers_list = set([x.liver_name for x in on_lives])
-    del_channels = [x for x in channels if x.name not in livers_list]
+    del_channels = [x for x in guild.text_channels if x.name not in livers_list]
     for del_channel in del_channels:
         print(del_channel.name)
         await del_channel.delete()
                   
     if len(on_lives) > 0:
-        print(f"-----\nexist text channels\n{channels}")
+        print(f"-----\nexist text channels\n{guild.text_channels}")
 
         # send on live message
         for on_live in on_lives:
-            exist_channels = [x for x in channels if on_live.liver_name == x.name]
+            exist_channels = [x for x in guild.text_channels if on_live.liver_name == x.name]
 
-            if len(exist_channels) == 0:
-                for tag in on_live.liver_tags:
-                    cat = [x for x in guild.categories if x.name in tag]
-                    new_channel = await guild.create_text_channel(name=on_live.liver_name, category=cat[0])
-                    exist_channels.append(new_channel)
-                    print(f"-----\ncreate text channel\n{new_channel.name}")
-
-                    # channels update
-                    channels = guild.text_channels
+            for tag in on_live.liver_tags:
+                categories = [x for x in guild.categories if x.name in tag]
+                for category in categories:
+                    category_channels = category.channels
+                    if not on_live.liver_name in [x.name for x in category_channels]:
+                        new_channel = await guild.create_text_channel(name=on_live.liver_name, category=category)
+                        exist_channels.append(new_channel)
+                        print(f"create text channel:{new_channel.name}")
                 
             for channel in exist_channels:
-                await channel.send(on_live.live_title + "\n" + on_live.URL)
-        
+                # check is message duplicate
+                messages = [message async for message in channel.history(limit=20)]
+                if on_live.live_title in [x.content for x in messages]:
+                    continue
 
-
+                await channel.send(on_live.live_title)
+                await channel.send(on_live.URL)
 
 
 client.run(BOT_TOKEN, log_handler=handler)

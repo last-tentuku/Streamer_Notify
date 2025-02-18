@@ -3,7 +3,7 @@ from twitchAPI.twitch import Twitch
 from twitchAPI.helper import first
 import os
 import json
-from data_class import LiveData
+from src.data_class import LiveData
 
 twitch_app_id = os.environ["twitch_app_id"]
 twitch_app_secret = os.environ["twitch_app_secret"]
