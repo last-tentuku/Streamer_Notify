@@ -15,6 +15,8 @@ from src import myTwitch
 from src.data_class import LiveData
 
 BOT_TOKEN = os.environ["discord_token"]
+CATEGORY_ADMIN = "管理用"
+CHANNEL_LOG = "動作ログ"
 
 intents = discord.Intents.default()
 intents.message_content = True
@@ -22,13 +24,14 @@ intents.message_content = True
 client = discord.Client(intents=intents)
 guild = None
 
-
 handler = logging.FileHandler(filename="discord.log", encoding="utf-8", mode="w")
+
 
 @client.event
 async def on_ready():
     print("discord bot login")
     get_onlives_loop.start()
+
 
 @client.event
 async def on_message(message):
@@ -49,7 +52,6 @@ async def on_message(message):
     await message.channel.send("a")
 
 
-
 @tasks.loop(minutes=15)
 async def get_onlives_loop():
     print(f"[{datetime.now()}] get_onlives_loop")
@@ -66,14 +68,11 @@ async def get_onlives_loop():
 
     await remove_channels(on_lives, guild)
     await send_streaming_messages(on_lives, guild)
-
+    await send_admin_messages(on_lives, guild)
 
 async def remove_channels(on_lives, guild:discord.guild):
-    if len(on_lives) == 0:
-        return
-    
     livers_list = set([x.liver_name for x in on_lives])
-    del_channels = [x for x in guild.text_channels if x.name not in livers_list]
+    del_channels = [x for x in guild.text_channels if x.name not in livers_list and x.category.name != CATEGORY_ADMIN]
 
     if len(del_channels) > 0:
         print(f"-----\nremove text channels")
@@ -109,6 +108,20 @@ async def send_streaming_messages(on_lives, guild:discord.guild):
             await channel.send(on_live.live_title)
             await channel.send(on_live.URL)
 
+
+async def send_admin_messages(on_lives, guild:discord.guild):
+    await send_log_messages(on_lives, guild)
+
+
+async def send_log_messages(on_lives, guild:discord.guild):
+    livers_list = set([x.liver_name for x in on_lives])
+    log_channel = [x for x in guild.text_channels if x.name == CHANNEL_LOG][0]
+
+    if len(livers_list) > 0:
+        await log_channel.send(f"[{datetime.now()}]\n配信中の配信者リスト")
+        await log_channel.send("\n".join(livers_list))
+    else:
+        await log_channel.send(f"[{datetime.now()}]\n配信がありませんでした")
 
 
 
