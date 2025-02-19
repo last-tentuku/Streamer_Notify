@@ -64,37 +64,52 @@ async def get_onlives_loop():
     # get guild(server infomation)
     guild = client.guilds[0]
 
-    print(f"-----\nremove text channels")
+    await remove_channels(on_lives, guild)
+    await send_streaming_messages(on_lives, guild)
+
+
+async def remove_channels(on_lives, guild:discord.guild):
+    if len(on_lives) == 0:
+        return
+    
     livers_list = set([x.liver_name for x in on_lives])
     del_channels = [x for x in guild.text_channels if x.name not in livers_list]
-    for del_channel in del_channels:
-        print(del_channel.name)
-        await del_channel.delete()
-                  
-    if len(on_lives) > 0:
-        print(f"-----\nexist text channels\n{guild.text_channels}")
 
-        # send on live message
-        for on_live in on_lives:
-            exist_channels = [x for x in guild.text_channels if on_live.liver_name == x.name]
+    if len(del_channels) > 0:
+        print(f"-----\nremove text channels")
+        for del_channel in del_channels:
+            print(del_channel.name)
+            await del_channel.delete()
 
-            for tag in on_live.liver_tags:
-                categories = [x for x in guild.categories if x.name in tag]
-                for category in categories:
-                    category_channels = category.channels
-                    if not on_live.liver_name in [x.name for x in category_channels]:
-                        new_channel = await guild.create_text_channel(name=on_live.liver_name, category=category)
-                        exist_channels.append(new_channel)
-                        print(f"create text channel:{new_channel.name}")
-                
-            for channel in exist_channels:
-                # check is message duplicate
-                messages = [message async for message in channel.history(limit=20)]
-                if on_live.live_title in [x.content for x in messages]:
-                    continue
 
-                await channel.send(on_live.live_title)
-                await channel.send(on_live.URL)
+async def send_streaming_messages(on_lives, guild:discord.guild):
+    if len(on_lives) == 0:
+        return
+    
+    print(f"-----\nexist text channels\n{guild.text_channels}")
+
+    for on_live in on_lives:
+        exist_channels = [x for x in guild.text_channels if on_live.liver_name == x.name]
+
+        for tag in on_live.liver_tags:
+            categories = [x for x in guild.categories if x.name in tag]
+            for category in categories:
+                category_channels = category.channels
+                if not on_live.liver_name in [x.name for x in category_channels]:
+                    new_channel = await guild.create_text_channel(name=on_live.liver_name, category=category)
+                    exist_channels.append(new_channel)
+                    print(f"create text channel:{new_channel.name} - {category.name}")
+            
+        for channel in exist_channels:
+            # check is message duplicate
+            messages = [message async for message in channel.history(limit=20)]
+            if on_live.live_title in [x.content for x in messages]:
+                continue
+
+            await channel.send(on_live.live_title)
+            await channel.send(on_live.URL)
+
+
 
 
 client.run(BOT_TOKEN, log_handler=handler)
