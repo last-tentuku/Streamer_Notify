@@ -2,22 +2,20 @@ import asyncio
 from twitchAPI.twitch import Twitch
 from twitchAPI.helper import first
 import os
-import json
+import myJson
 from src.data_class import LiveData
 
 twitch_app_id = os.environ["twitch_app_id"]
 twitch_app_secret = os.environ["twitch_app_secret"]
 
 async def get_on_lives():
-
-    json_file = open("./json/streamers.json", 'r', encoding="utf-8_sig")
-    livers = json.load(json_file)
+    livers = myJson.load_livers()
     on_lives = []
 
     twitch = await Twitch(twitch_app_id, twitch_app_secret)
 
     # check on lives
-    for liver in livers["data"]:
+    for liver in livers:
         if not liver["twitch"]["display_name"]:
             continue
         

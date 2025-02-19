@@ -1,7 +1,7 @@
 import feedparser
 from googleapiclient.discovery import build
 import os
-import json
+import myJson
 import src.data_class as data_class
 
 DEVELOPER_KEY = os.environ["youtube_api_key"]
@@ -44,12 +44,10 @@ def is_err_https(status:int):
     return ret
 
 def get_onlives():
-
-    json_file = open("./json/streamers.json", 'r', encoding="utf-8_sig")
-    livers = json.load(json_file)
+    livers = myJson.load_livers()
     on_lives = []
 
-    for liver in livers["data"]:
+    for liver in livers:
         if not liver["youtube"]["channel_id"]:
             continue
 
@@ -71,4 +69,4 @@ def get_onlives():
 
 
 if __name__ == "__main__":
-    main()
+    get_onlives()
