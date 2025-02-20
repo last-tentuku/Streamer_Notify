@@ -19,6 +19,7 @@ BOT_TOKEN = os.environ["discord_token"]
 CATEGORY_ADMIN = "管理用"
 CHANNEL_LOG = "動作ログ"
 CHANNEL_REGISTERD_LIVERS = "登録配信者一覧"
+CHANNEL_COMMAND = "コマンド"
 
 intents = discord.Intents.default()
 intents.message_content = True
@@ -39,19 +40,12 @@ async def on_ready():
 async def on_message(message):
     if message.author == client.user:
         return
-    
-    if message.content.startswith("makechannel"):
+    if message.channel.name != CHANNEL_COMMAND:
+        return
 
-        # get guild(server infomation)
-        guild = client.guilds[0]
-        print(guild)
-
-        cat = await guild.create_category("dhalshim")
-        print("create category\n",cat)
-        ch = await guild.create_text_channel(name="yoga",category=cat)
-        print("create txtch\n",ch)
-
-    await message.channel.send("a")
+    attachment = message.attachments
+    if attachment[0].filename.endswith(".json"):
+        myJson.write_livers(attachment[0].url)
 
 
 @tasks.loop(minutes=15)

@@ -1,5 +1,5 @@
 import json
-
+import requests
 
 def load_livers():
     f = open("./json/streamers.json", 'r', encoding="utf-8_sig")
@@ -9,10 +9,12 @@ def load_livers():
     return data
 
 
-def write_livers(data:dict):
-    f = open("./json/streamers.json", 'w', encoding="utf-8_sig")
-    json.dump(data, f, indent=3, ensure_ascii=False)
-    f.close
+def write_livers(url):
+    data = requests.get(url).content
+
+    with open("./json/streamers.json", 'wb') as f:
+        f.write(data)
+    
 
 
 def getindex_by_id(id:int):
