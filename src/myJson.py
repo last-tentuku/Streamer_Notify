@@ -49,7 +49,10 @@ def mod_by_id(id:int, data:dict):
     write_livers(js)
     
 
+def get_livers_name():
+    js = load_livers()
+    return [ str(x["id"]) + " - " + x["name"] + " - [" + ",".join(x["tags"]) + "]" for x in js]
+
 if __name__ == "__main__":
-    dic = getdict_by_id(810)
-    dic["id"]=893
-    mod_by_id(810, dic)
+    a=get_livers_name()
+    print(a)

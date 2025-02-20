@@ -12,11 +12,13 @@ sys.path.append(
 
 from src import myYoutube
 from src import myTwitch
+from src import myJson
 from src.data_class import LiveData
 
 BOT_TOKEN = os.environ["discord_token"]
 CATEGORY_ADMIN = "管理用"
 CHANNEL_LOG = "動作ログ"
+CHANNEL_REGISTERD_LIVERS = "登録配信者一覧"
 
 intents = discord.Intents.default()
 intents.message_content = True
@@ -111,6 +113,7 @@ async def send_streaming_messages(on_lives, guild:discord.guild):
 
 async def send_admin_messages(on_lives, guild:discord.guild):
     await send_log_messages(on_lives, guild)
+    await send_registed_livers(guild)
 
 
 async def send_log_messages(on_lives, guild:discord.guild):
@@ -122,6 +125,15 @@ async def send_log_messages(on_lives, guild:discord.guild):
         await log_channel.send("\n".join(livers_list))
     else:
         await log_channel.send(f"[{datetime.now()}]\n配信がありませんでした")
+
+
+async def send_registed_livers(guild:discord.guild):
+    livers_name = myJson.get_livers_name()
+    registed_livers_channel = [x for x in guild.text_channels if x.name == CHANNEL_REGISTERD_LIVERS][0]
+
+    messages = [message async for message in registed_livers_channel.history(limit=100)]
+    await registed_livers_channel.delete_messages(messages)
+    await registed_livers_channel.send("\n".join(livers_name))
 
 
 
