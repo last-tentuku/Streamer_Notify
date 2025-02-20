@@ -46,6 +46,7 @@ async def on_message(message):
     attachment = message.attachments
     if attachment[0].filename.endswith(".json"):
         myJson.write_livers(attachment[0].url)
+        await send_registed_livers(message.guild)
 
 
 @tasks.loop(minutes=15)
@@ -107,7 +108,6 @@ async def send_streaming_messages(on_lives, guild:discord.guild):
 
 async def send_admin_messages(on_lives, guild:discord.guild):
     await send_log_messages(on_lives, guild)
-    await send_registed_livers(guild)
 
 
 async def send_log_messages(on_lives, guild:discord.guild):
