@@ -18,3 +18,6 @@ def mod_liver_name(live_data :LiveData, liver_name: str):
 
 def mod_liver_tags(live_data :LiveData, liver_tags: list):
     live_data.liver_tags.append(liver_tags)
+
+def printData(live_data :LiveData):
+    print(live_data.liver_name + ":" + live_data.live_title)

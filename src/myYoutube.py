@@ -25,6 +25,7 @@ def get_videos_list(rss) -> data_class.LiveData:
             if "actualStartTime" in item["liveStreamingDetails"] and "actualEndTime" not in item["liveStreamingDetails"]:
                 rssdata = next(x for x in rss["entries"] if item["id"] == x["yt_videoid"])
                 data = data_class.LiveData(rssdata["author_detail"]["name"], rssdata["title"], rssdata["link"])
+                data_class.printData(data)
                 on_lives.append(data)
 
     return on_lives
@@ -44,6 +45,7 @@ def is_err_https(status:int):
     return ret
 
 def get_onlives():
+    print("youtube get_onlives start --- ")
     livers = myJson.load_livers()
     on_lives = []
 

@@ -33,6 +33,12 @@ handler = logging.FileHandler(filename="discord.log", encoding="utf-8", mode="w"
 @client.event
 async def on_ready():
     print("discord bot login")
+
+    print("OS environment --- ")
+    print("twitch_app_id = " + os.environ["twitch_app_id"])
+    print("twitch_app_secret = " + os.environ["twitch_app_secret"])
+    print("youtube_api_key = " + os.environ["youtube_api_key"])
+    
     get_onlives_loop.start()
 
 
